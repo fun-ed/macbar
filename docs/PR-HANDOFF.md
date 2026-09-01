@@ -2,7 +2,8 @@
 
 ## 分支與 worktree
 
-- 一律從 main 開 `feat-v<version>`（或 `fix-v<version>-<slug>`）分支，對應 worktree `../macbar-wt/<branch>`。
+- 預設整合分支是 `develop`；功能一律從 develop 開 `feat-v<version>`（或 `fix-<slug>`），對應 worktree `../macbar-wt/<branch>`，PR 回 develop，develop 穩定後再進 main 打 release。
+- main 只放已發佈狀態；develop 是整合線。
 - PR 建立後若已 merge：`git worktree remove` + 刪分支，main 保持乾淨。
 
 ## PR 必備內容
