@@ -7,6 +7,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     private let audio = AudioController()
     private let popover = NSPopover()
     private var statusItem: NSStatusItem?
+    private var keyMonitor: Any?
     private var cancellables = Set<AnyCancellable>()
     private var lastPopoverCloseDate: Date?
 
@@ -35,6 +36,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
         NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
             self?.handleScroll(event)
             return event
+        }
+
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self,
+                  self.popover.isShown,
+                  event.modifierFlags.contains(.command),
+                  event.charactersIgnoringModifiers == "q" else { return event }
+            NSApp.terminate(nil)
+            return nil
         }
     }
 
@@ -136,5 +146,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
         true
+    }
+
+    deinit {
+        if let keyMonitor { NSEvent.removeMonitor(keyMonitor) }
     }
 }
