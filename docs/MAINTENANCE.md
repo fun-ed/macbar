@@ -21,6 +21,16 @@
 - SMAppService（Launch at Login）對 ad-hoc 簽章 app 可能註冊失敗；失敗時選單狀態不變，屬已知限制。
 - 無 TCC 權限是設計決策：任何需要麥克風 capture 的功能都屬範圍外。
 
+## Skills 與 Agents 維護
+
+`.github/skills/`（macbar-build、macbar-verify、macbar-release）與 `.github/agents/`（dev、review）是會影響未來行為的設定檔，不是普通文件：
+
+- 修改前先備份：`cp <file> <file>.bak-$(date +%Y%m%d-%H%M%S)`。
+- 任何流程變更（SOT、驗證矩陣、merge 規則）落地時，同 commit 內同步對應 skill / agent 的描述，避免漂移。
+- 每次版本升級前對照 `PLAN.md` 逐檔檢查 skills / agents 是否仍與現行流程一致。
+- Agent 的權限範圍（可讀什麼、可跑什麼、不可破壞什麼）只能縮不能放；放寬需人類明示同意。
+- 刪除 skill / agent 屬破壞性操作，需先取得同意並留下備份。
+
 ## 疑難排解
 
 | 症狀 | 檢查 |

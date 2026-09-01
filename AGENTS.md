@@ -21,3 +21,4 @@
 | AI 開發準則（詳細） | `docs/AI-DEVELOPMENT.md` |
 | Review / Eval / Test 準則 | `docs/REVIEW-TEST.md` |
 | 交接 PR 準則 | `docs/PR-HANDOFF.md` |
+| Skills / agents 維護 | `docs/MAINTENANCE.md`（§ Skills 與 Agents 維護） |
