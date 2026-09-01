@@ -24,12 +24,20 @@ final class AudioController: ObservableObject {
     @Published private(set) var inputAvailable = false
     @Published private(set) var outputHasVolumeControl = false
     @Published private(set) var inputHasVolumeControl = false
+    @Published private(set) var meteringActive = false
+    @Published private(set) var micPermissionDenied = false
+    @Published private(set) var micMeteringFailed = false
+    @Published private(set) var outputMeteringFailed = false
+    @Published private(set) var outputLevel: Double = 0
+    @Published private(set) var inputLevel: Double = 0
 
     private var outputDevice: AudioObjectID = 0
     private var inputDevice: AudioObjectID = 0
     private var hardwareMute = [VolumeKind: Bool]()
     private var softwareMuted = [VolumeKind: Bool]()
     private var listeners: [(device: AudioObjectID, address: AudioObjectPropertyAddress, block: AudioObjectPropertyListenerBlock)] = []
+    private let micMonitor = MicLevelMonitor()
+    private let outputMonitor = OutputLevelMonitor()
 
     private let audioQueue = DispatchQueue(label: "no.runbox.funed.macbar.audio")
     private let defaults = UserDefaults.standard
@@ -39,6 +47,11 @@ final class AudioController: ObservableObject {
         softwareMuted[.input] = defaults.bool(forKey: "softwareMuted.input")
         installDefaultDeviceListeners()
         refresh()
+        micMonitor.onLevel = { [weak self] value in self?.inputLevel = value }
+        micMonitor.onPermissionDenied = { [weak self] in self?.micPermissionDenied = true }
+        micMonitor.onFailed = { [weak self] in self?.micMeteringFailed = true }
+        outputMonitor.onLevel = { [weak self] value in self?.outputLevel = value }
+        outputMonitor.onFailed = { [weak self] in self?.outputMeteringFailed = true }
     }
 
     deinit {
@@ -97,6 +110,39 @@ final class AudioController: ObservableObject {
 
     func nudgeOutputVolume(_ delta: Float) {
         setVolume(.output, outputVolume + delta)
+    }
+
+    // MARK: - Sound level metering
+
+    func setMeteringActive(_ active: Bool) {
+        guard meteringActive != active else { return }
+        meteringActive = active
+        outputLevel = 0
+        inputLevel = 0
+        if active {
+            micPermissionDenied = false
+            micMeteringFailed = false
+            outputMeteringFailed = false
+            micMonitor.requestAndStart()
+            outputMonitor.start()
+        } else {
+            micMonitor.stop()
+            outputMonitor.stop()
+        }
+    }
+
+    func level(for kind: VolumeKind) -> Double {
+        kind == .output ? outputLevel : inputLevel
+    }
+
+    func isMetering(_ kind: VolumeKind) -> Bool {
+        guard meteringActive else { return false }
+        switch kind {
+        case .output:
+            return !outputMeteringFailed
+        case .input:
+            return !micPermissionDenied && !micMeteringFailed
+        }
     }
 
     // MARK: - Device tracking

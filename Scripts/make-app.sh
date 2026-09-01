@@ -29,7 +29,9 @@ cat > "$APP/Contents/Info.plist" <<'PLIST_EOF'
     <key>CFBundleVersion</key><string>5</string>
     <key>LSMinimumSystemVersion</key><string>13.0</string>
     <key>LSUIElement</key><true/>
+    <key>NSAudioCaptureUsageDescription</key><string>macbar needs system audio access to show the live output level.</string>
     <key>NSHighResolutionCapable</key><true/>
+    <key>NSMicrophoneUsageDescription</key><string>macbar needs microphone access to show the live input level.</string>
     <key>NSPrincipalClass</key><string>NSApplication</string>
 </dict>
 </plist>
