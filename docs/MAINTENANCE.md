@@ -1,0 +1,31 @@
+# 維護準則
+
+## 版本升級（唯一流程）
+
+1. 改 `Scripts/make-app.sh` 內的 `Info.plist`：`CFBundleShortVersionString`、`CFBundleVersion`。
+2. 改 `Scripts/make-dmg.sh` 的輸出檔名 `macbar-<ver>-arm64.dmg`。
+3. 更新 `PLAN.md` 版本歷史與驗收清單。
+4. 重建並跑完 `docs/REVIEW-TEST.md` 的驗證矩陣。
+5. commit：`build: release vX.Y.Z`。不 co-author。
+
+## 日常維護
+
+- 任何行為變更先改 `PLAN.md`（SOT），再改程式。
+- `dist/`、`build/`、`.build/` 是 gitignored 產物，可隨時刪除重建。
+- CoreAudio API 變動風險低；升 macOS SDK 後重跑 `swift build -c release` 確認。
+
+## 已知邊界與取捨
+
+- 滾輪方向假設：`deltaY > 0` = 音量增加。若實際反向，改 `handleScroll` 的正負號一行。
+- `create-dmg` 需要簽章身分；無身分時自動後備 `hdiutil` 純壓縮 DMG（無美化背景，屬預期）。
+- SMAppService（Launch at Login）對 ad-hoc 簽章 app 可能註冊失敗；失敗時選單狀態不變，屬已知限制。
+- 無 TCC 權限是設計決策：任何需要麥克風 capture 的功能都屬範圍外。
+
+## 疑難排解
+
+| 症狀 | 檢查 |
+|---|---|
+| app 啟動即退出 | `log show --predicate 'process == "macbar"' --last 5m` |
+| 滑桿無反應 | 確認裝置有 VolumeScalar 屬性（`AudioObjectHasProperty`） |
+| 換裝置沒跟隨 | 確認 default-device listener 有重註冊 |
+| DMG 打不開 | ad-hoc 簽章需右鍵「打開」繞 Gatekeeper |
