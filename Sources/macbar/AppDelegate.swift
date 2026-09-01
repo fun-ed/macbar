@@ -26,10 +26,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
         }
         updateStatusIcon()
 
-        audio.$outputMuted.combineLatest(audio.$inputMuted)
+        audio.$outputMuted.combineLatest(audio.$inputMuted, audio.$outputVolume, audio.$inputVolume)
             .dropFirst()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _, _ in self?.updateStatusIcon() }
+            .sink { [weak self] _, _, _, _ in self?.updateStatusIcon() }
             .store(in: &cancellables)
 
         NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
@@ -50,9 +50,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     private func updateStatusIcon() {
         guard let button = statusItem?.button else { return }
         let symbolName: String
-        if audio.inputMuted {
+        if isSilent(.input) {
             symbolName = "mic.slash.fill"
-        } else if audio.outputMuted {
+        } else if isSilent(.output) {
             symbolName = "speaker.slash.fill"
         } else {
             symbolName = "speaker.wave.2.fill"
@@ -61,6 +61,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
         image?.isTemplate = true
         image?.size = NSSize(width: 18, height: 18)
         button.image = image
+    }
+
+    private func isSilent(_ kind: VolumeKind) -> Bool {
+        guard audio.isAvailable(kind) else { return false }
+        if audio.isMuted(kind) { return true }
+        return audio.hasVolumeControl(kind) && audio.volume(for: kind) < 0.005
     }
 
     @objc private func statusItemClicked() {
