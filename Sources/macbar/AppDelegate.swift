@@ -118,6 +118,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
         menu.delegate = self
         menu.autoenablesItems = false
 
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+        let versionItem = NSMenuItem(title: "macbar v\(version)", action: nil, keyEquivalent: "")
+        versionItem.isEnabled = false
+        menu.addItem(versionItem)
+
+        let github = NSMenuItem(title: "GitHub Project", action: #selector(openGitHubProject), keyEquivalent: "")
+        github.target = self
+        menu.addItem(github)
+
+        menu.addItem(.separator())
+
         let login = NSMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
         login.target = self
         login.state = SMAppService.mainApp.status == .enabled ? .on : .off
@@ -134,6 +145,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
 
     func menuDidClose(_ menu: NSMenu) {
         statusItem?.menu = nil
+    }
+
+    private let projectURL = "https://github.com/fun-ed/macbar"
+
+    @objc private func openGitHubProject() {
+        if let url = URL(string: projectURL) {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     @objc private func toggleLaunchAtLogin() {
