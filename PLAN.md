@@ -35,6 +35,7 @@
 
 - Menubar icon 與 popover 圖示改為「靜音態」語意：mute **或** 音量 0% 都顯示斜線圖示（`speaker.slash` / `mic.slash`），不再讓人誤判為有聲（mic 狀態仍優先）
 - Popover 圖示動畫：有聲時 icon 以呼吸明暗循環（TimelineView 驅動，不依賴 SF Symbol variable layers，speaker 與 mic 都會動）；mute 切換時 bounce（macOS 14+，舊版自動停用）
+- 滑桿下方新增實際音量 animation bar：填充寬度即時對應目前音量，有聲時跑流光（shimmer）動畫；0%/mute 時停止並熄滅
 - Popover 開啟（focus 在 app）時按 **Cmd+Q** 可直接退出
 
 ### v0.1.0（2026-09-01）
