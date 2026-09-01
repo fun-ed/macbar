@@ -31,13 +31,13 @@
 
 ## 版本歷史
 
-### v0.2 候選（評估中，未拍板不動工）
+### v0.2.0（開發中，2026-09-02 拍板）
 
-- 即時聲音 VU 表（真實 loudness，非設定值）：
-  - 麥克風端：需要 capture → 觸發 TCC 麥克風權限，打破 v1「無 TCC」禁區，須使用者明示同意
-  - 喇叭端：macOS 14.4+ CoreAudio process tap（`AudioHardwareCreateProcessTap`）可取系統輸出電平，免 TCC 但需處理 tap 生命週期與常駐功耗；ScreenCaptureKit 會跳出系統錄製授權，不建議
-  - 連帶影響：Info.plist 加 `NSMicrophoneUsageDescription`、權限被拒的降級 UX、常駐 capture 的電量成本
-  - 需人類拍板範圍後才開工
+- 真實聲音 VU 表：popover 的 level bar 改由實際 loudness 驅動（有聲音才動，無聲歸零），取代純設定值模式
+  - Mic 端：AVAudioEngine input tap → RMS；首次啟動觸發 TCC 麥克風權限（Info.plist 加 `NSMicrophoneUsageDescription`）— **使用者已拍板接受打破「無 TCC」禁區**
+  - 喇叭端：CoreAudio process tap（`AudioHardwareCreateProcessTap`，macOS 14.4+），系統首次會跳同意對話框；macOS 13/14.3 無此 API
+  - 權限被拒或系統不支援 → level bar 退回「設定值」模式（v0.1.1 行為），不 crash
+  - tap 只在 popover 開啟期間運作，關閉即停（省電）
 
 ### v0.1.1（2026-09-02）
 
