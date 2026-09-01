@@ -29,6 +29,7 @@ swift build -c release && ./Scripts/make-app.sh && codesign --verify --strict bu
 | Slider does nothing | device lacks VolumeScalar; app falls back to channels 1...32 |
 | Device switch not followed | default-device listener re-registration |
 | Scroll direction inverted | flip sign in `handleScroll` in AppDelegate.swift |
+| VU bar 不動 | 系統設定 → 隱私權 → 麥克風／系統音訊 是否允許 macbar；macOS 14.4 以下 speaker bar 無 tap |
 | DMG won't open | ad-hoc signing: right-click → Open to bypass Gatekeeper |
 
 Rules: change nothing without a hypothesis; restore any device state (volume/mute) touched during debugging; rebuild and re-verify after each fix.

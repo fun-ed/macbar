@@ -25,6 +25,7 @@
 
 ## 禁區
 
-- 不引入 TCC 權限、沙盒、第三方依賴
+- 不引入沙盒、第三方依賴
+- TCC／audio capture 權限屬範圍變更，須先經 PLAN.md 拍板（v0.2.0 已引入 mic 與 system audio 量測）
 - 不擴大檔案權限、不碰 secrets
 - 不在 main 直接開發功能；main 只收 merge 與 docs

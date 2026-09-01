@@ -10,14 +10,18 @@
 
 ```
 Sources/macbar/
-  main.swift            NSApplication bootstrap、activation policy .accessory
-  AppDelegate.swift     NSStatusItem、NSPopover、滾輪監聽、右鍵選單、SMAppService
-  AudioController.swift CoreAudio：預設裝置解析、volume/mute 讀寫、監聽器、軟體 mute 後備
-  PopoverView.swift     SwiftUI popover（兩列：Speaker / Microphone）
+  main.swift              NSApplication bootstrap、activation policy .accessory
+  AppDelegate.swift       NSStatusItem、NSPopover、滾輪/鍵盤監聽、右鍵選單、SMAppService、metering 開關
+  AudioController.swift   CoreAudio：預設裝置解析、volume/mute 讀寫、監聽器、軟體 mute 後備、metering 狀態
+  PopoverView.swift       SwiftUI popover（兩列滑桿 + VolumeLevelBar + 圖示動畫）
+  LevelMeter.swift        RMS→dB 映射與 attack/release 平滑（thread-safe）
+  MicLevelMonitor.swift   AVAudioEngine input tap（TCC 流程）
+  OutputLevelMonitor.swift CoreAudio process tap + 私有 aggregate device（macOS 14.4+）
 Scripts/
-  make-icon.swift       產生 AppIcon.iconset（Bezier 繪製，不依賴外部素材）
-  make-app.sh           swift build → 組 .app → Info.plist → ad-hoc codesign
-  make-dmg.sh           create-dmg（失敗 fallback hdiutil UDZO）
+  make-icon.swift         產生 AppIcon.iconset（Bezier 繪製，不依賴外部素材）
+  make-app.sh             swift build → 組 .app → Info.plist → ad-hoc codesign
+  make-dmg.sh             create-dmg（失敗 fallback hdiutil UDZO）
+  smoke-coreaudio.swift   CoreAudio 活體煙囪測試（eval 用）
 ```
 
 ## CoreAudio 規則
@@ -30,7 +34,7 @@ Scripts/
 
 ## 禁止事項
 
-- 不加 TCC / Info.plist 隱私描述（不需要）
+- 新增 TCC / audio capture 類權限前，先在 PLAN.md 拍板（v0.2.0 已引入 mic TCC 與 system audio capture，皆為量測電平、不錄音）
 - 不加沙盒 entitlements
 - 不引入 SPM 第三方依賴
 - 不改 main 直接 commit 功能程式碼（走 worktree）

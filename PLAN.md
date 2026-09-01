@@ -13,7 +13,7 @@
 | 技術棧 | Swift 原生，SwiftPM 管理，UI 用 SwiftUI（狀態列容器用 NSStatusItem + NSPopover，因為需要 icon 滾輪與右鍵選單的完整控制權） |
 | 平台 | arm64-only，最低 macOS 13（Ventura） |
 | App 形態 | LSUIElement（無 Dock 圖示），常駐 menubar |
-| 權限 | 不需要任何 TCC 授權：只讀寫 CoreAudio 裝置的音量與 mute 屬性，不 capture 音訊 |
+| 權限 | v0.1 無 TCC；v0.2.0 起拍板引入：麥克風 TCC（AVAudioEngine 量測）+ 系統音訊 capture（process tap），任一被拒即退回設定值模式 |
 | 控制範圍 | 只跟隨系統預設輸出（喇叭）與預設輸入（麥克風），換裝置自動跟隨 |
 | Popover | 喇叭、麥克風各一條滑桿 + mute 按鈕 + 百分比，拖曳即時生效 |
 | Icon 滾輪 | 在 menubar 圖示上滾動 = 調整喇叭音量 |
@@ -54,7 +54,7 @@
 
 - 裝置選擇器／多裝置管理
 - 全域快捷鍵
-- 麥克風聲音預覽（會引入 TCC 麥克風權限）
+- 錄音／聲音預覽播放（v0.2.0 已引入僅量測電平的 VU 表，不錄音不播放）
 - Developer ID 簽章與 notarization
 - 自動更新、多國語系
 

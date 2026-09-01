@@ -7,12 +7,23 @@ macOS menubar 音量控制器：即時調整系統**喇叭**與**麥克風**的�
 ## 功能
 
 - 常駐 menubar，點開 popover：喇叭、麥克風各一條滑桿 + mute 按鈕 + 百分比，拖曳即時生效
-- 圖示上滾輪 = 調喇叭音量
-- 單一 icon 反映狀態：喇叭 mute → `speaker.slash`；麥克風 mute → `mic.slash`（mic 狀態優先）
+- **即時 VU 表**：滑桿下的 level bar 由實際聲音驅動 — 有聲音才動、無聲歸零（v0.2.0）
+- 圖示上滾輪 = 調喇叭音量；有聲時圖示呼吸動畫、bar 有流光
+- 單一 icon 反映「靜音態」：mute **或** 音量 0% 都顯示斜線圖示（mic 狀態優先）
 - 換預設裝置自動跟隨（CoreAudio 監聽）
 - 不支援硬體 mute 的裝置：改用音量歸 0 + 軟體旗標，解除後還原
-- 右鍵選單：Launch at Login、Quit
-- 不需要任何 TCC 權限（只控裝置屬性，不 capture 音訊）
+- 右鍵選單：Launch at Login、Quit；popover 開啟時 Cmd+Q 可退出
+- Popover 開啟期間才跑 metering，關閉即停
+
+## 權限（v0.2.0 起，首次開 popover 會遇到）
+
+| 授權 | 用途 | 拒絕的後果 |
+|---|---|---|
+| 麥克風（TCC） | 量測即時輸入音量 | mic bar 退回「設定值」模式 |
+| 系統音訊 capture（process tap） | 量測即時輸出音量 | speaker bar 退回「設定值」模式 |
+
+- 完整 VU 表需要 **macOS 14.4+**（process tap）；macOS 13 / 14.3 的 speaker bar 走設定值模式
+- 滑桿控制音量本身**不需要**任何權限
 
 ## 安裝（使用者）
 
@@ -44,6 +55,7 @@ log show --predicate 'process == "macbar"' --last 5m
 swift Scripts/smoke-coreaudio.swift
 ```
 
+VU 表不動？檢查「系統設定 → 隱私權與安全性 → 麥克風 / 系統音訊錄製」是否允許 macbar。
 常見症狀對照表見 `docs/MAINTENANCE.md`（§疑難排解）。
 滾輪方向若與預期相反：改 `Sources/macbar/AppDelegate.swift` 的 `handleScroll` 正負號。
 

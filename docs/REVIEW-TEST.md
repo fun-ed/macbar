@@ -33,6 +33,9 @@ hdiutil detach /tmp/macbar-mnt -quiet
 7. 系統偏好切換預設輸出 → 控制對象自動跟隨
 8. 右鍵 → Launch at Login 可開關；Quit 可退出
 9. 無 mute 屬性的裝置 → mute 走音量 0，解除後音量還原
+10. 播放音樂 → speaker level bar 隨實際聲音起伏，停止後歸零（v0.2.0）
+11. 對麥克風說話 → mic level bar 跟動（v0.2.0）
+12. 拒絕麥克風／系統音訊授權 → 該 bar 退回設定值模式，不 crash（v0.2.0）
 
 ## Eval 記錄
 

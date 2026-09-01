@@ -19,7 +19,8 @@
 - 滾輪方向假設：`deltaY > 0` = 音量增加。若實際反向，改 `handleScroll` 的正負號一行。
 - `create-dmg` 需要簽章身分；無身分時自動後備 `hdiutil` 純壓縮 DMG（無美化背景，屬預期）。
 - SMAppService（Launch at Login）對 ad-hoc 簽章 app 可能註冊失敗；失敗時選單狀態不變，屬已知限制。
-- 無 TCC 權限是設計決策：任何需要麥克風 capture 的功能都屬範圍外。
+- VU 表：output tap 需 macOS 14.4+（13/14.3 的 speaker bar 走設定值模式）；任一授權被拒 → 該 bar 退回設定值模式；metering 只在 popover 開啟期間運作（省電）。
+- 麥克風 TCC 與系統音訊 capture 已於 v0.2.0 經拍板引入，僅量測電平、不錄音不存檔。
 
 ## Skills 與 Agents 維護
 
