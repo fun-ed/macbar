@@ -63,9 +63,10 @@ struct VolumeLevelBar: View {
     }
 
     private func shimmerOffset(in fillWidth: CGFloat, at date: Date) -> CGFloat {
-        let travel = max(0, fillWidth - 16)
-        let t = date.timeIntervalSinceReferenceDate * 2.4
-        return (sin(t) * 0.5 + 0.5) * travel
+        let travel = max(0, fillWidth + 16)
+        let t = date.timeIntervalSinceReferenceDate * 1.6
+        let phase = t.truncatingRemainder(dividingBy: 2.0) / 2.0
+        return phase * travel - 16
     }
 }
 
