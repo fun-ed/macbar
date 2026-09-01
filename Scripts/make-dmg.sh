@@ -12,6 +12,7 @@ if npx --yes create-dmg "$APP" "$OUT" --overwrite; then
     mv "$OUT/macbar 0.1.0.dmg" "$FINAL"
 else
     echo "create-dmg failed, falling back to hdiutil" >&2
+    rm -f "$OUT/macbar "*.dmg
     STAGING="$(mktemp -d)"
     cp -R "$APP" "$STAGING/"
     ln -s /Applications "$STAGING/Applications"
