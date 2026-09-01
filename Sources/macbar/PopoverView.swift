@@ -14,6 +14,26 @@ struct PopoverView: View {
     }
 }
 
+extension View {
+    @ViewBuilder
+    func volumeAnimation(isActive: Bool) -> some View {
+        if #available(macOS 14.0, *) {
+            symbolEffect(.variableColor.iterative, options: .repeating, isActive: isActive)
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
+    func symbolBounce<V: Equatable>(value: V) -> some View {
+        if #available(macOS 14.0, *) {
+            symbolEffect(.bounce, value: value)
+        } else {
+            self
+        }
+    }
+}
+
 struct VolumeRow: View {
     @EnvironmentObject var audio: AudioController
     let kind: VolumeKind
@@ -21,8 +41,9 @@ struct VolumeRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
-                Image(systemName: kind == .output ? "speaker.wave.2.fill" : "mic.fill")
+                Image(systemName: leadingSymbol)
                     .frame(width: 20)
+                    .volumeAnimation(isActive: !isSilent)
                 Text(kind == .output ? "Speaker" : "Microphone")
                     .font(.headline)
                 Spacer()
@@ -37,6 +58,7 @@ struct VolumeRow: View {
                     Image(systemName: muteSymbol)
                         .frame(width: 22)
                         .foregroundStyle(audio.isMuted(kind) ? Color.red : Color.primary)
+                        .symbolBounce(value: audio.isMuted(kind))
                 }
                 .buttonStyle(.borderless)
                 .disabled(!audio.isAvailable(kind))
@@ -61,6 +83,19 @@ struct VolumeRow: View {
 
     private var muted: Bool {
         audio.isMuted(kind)
+    }
+
+    private var isSilent: Bool {
+        audio.isMuted(kind) || (audio.hasVolumeControl(kind) && audio.volume(for: kind) < 0.005)
+    }
+
+    private var leadingSymbol: String {
+        switch kind {
+        case .output:
+            return isSilent ? "speaker.slash.fill" : "speaker.wave.2.fill"
+        case .input:
+            return isSilent ? "mic.slash.fill" : "mic.fill"
+        }
     }
 
     private var muteSymbol: String {
