@@ -31,7 +31,7 @@
 
 ## 版本歷史
 
-### v0.2.0（開發中，2026-09-02 拍板）
+### v0.2.0（2026-09-02 已發佈）
 
 - 真實聲音 VU 表：popover 的 level bar 改由實際 loudness 驅動（有聲音才動，無聲歸零），取代純設定值模式
   - Mic 端：AVAudioEngine input tap → RMS；首次啟動觸發 TCC 麥克風權限（Info.plist 加 `NSMicrophoneUsageDescription`）— **使用者已拍板接受打破「無 TCC」禁區**
