@@ -34,6 +34,6 @@
 | `.github/skills/macbar-build` | 建置 + 組 app + ad-hoc 簽章 |
 | `.github/skills/macbar-verify` | 機器可驗 eval 套件 |
 | `.github/skills/macbar-accept` | 驗收測試程序（eval + 人工清單 + 證據格式） |
-| `.github/skills/macbar-release` | DMG 產製與驗證 |
+| `.github/skills/macbar-release` | 升版 + DMG + GitHub Release（changelog + DMG asset） |
 | `.github/skills/macbar-maintain` | 升版 + 文件/skills/agents 一致性稽核 |
 | `.github/skills/macbar-debug` | 除錯流程（log、smoke、症狀對照） |

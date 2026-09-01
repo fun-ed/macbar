@@ -7,6 +7,7 @@
 3. 更新 `PLAN.md` 版本歷史與驗收清單。
 4. 重建並跑完 `docs/REVIEW-TEST.md` 的驗證矩陣。
 5. commit：`build: release vX.Y.Z`。不 co-author。
+6. GitHub Release：`git tag vX.Y.Z` + `gh release create` 附 changelog 與 DMG asset（見 `.github/skills/macbar-release/SKILL.md`）。
 
 ## 日常維護
 
