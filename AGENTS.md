@@ -21,4 +21,19 @@
 | AI 開發準則（詳細） | `docs/AI-DEVELOPMENT.md` |
 | Review / Eval / Test 準則 | `docs/REVIEW-TEST.md` |
 | 交接 PR 準則 | `docs/PR-HANDOFF.md` |
+| 驗收測試準則 | `docs/ACCEPTANCE.md` |
 | Skills / agents 維護 | `docs/MAINTENANCE.md`（§ Skills 與 Agents 維護） |
+
+## Agents 與 Skills
+
+| 檔案 | 職責 |
+|---|---|
+| `.github/agents/dev.agent.md` | scoped 開發（單一任務、worktree、DoD 門檻） |
+| `.github/agents/review.agent.md` | 獨立複審 + eval，PASS/FAIL 裁決 |
+| `.github/agents/maintain.agent.md` | 維護（升版、文件同步、skills/agents 稽核） |
+| `.github/skills/macbar-build` | 建置 + 組 app + ad-hoc 簽章 |
+| `.github/skills/macbar-verify` | 機器可驗 eval 套件 |
+| `.github/skills/macbar-accept` | 驗收測試程序（eval + 人工清單 + 證據格式） |
+| `.github/skills/macbar-release` | DMG 產製與驗證 |
+| `.github/skills/macbar-maintain` | 升版 + 文件/skills/agents 一致性稽核 |
+| `.github/skills/macbar-debug` | 除錯流程（log、smoke、症狀對照） |
