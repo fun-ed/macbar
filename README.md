@@ -70,3 +70,7 @@ swift Scripts/smoke-coreaudio.swift
 ## 作者
 
 fun-ed &lt;50657368+fun-ed@users.noreply.github.com&gt;
+
+## License
+
+[MIT](LICENSE)
