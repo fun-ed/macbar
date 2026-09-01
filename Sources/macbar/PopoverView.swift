@@ -18,9 +18,13 @@ struct VolumeLevelBar: View {
     @EnvironmentObject private var audio: AudioController
     let kind: VolumeKind
 
+    private var metering: Bool {
+        audio.isMetering(kind)
+    }
+
     private var fraction: Double {
         guard audio.isAvailable(kind), audio.hasVolumeControl(kind) else { return 0 }
-        return Double(audio.volume(for: kind))
+        return metering ? audio.level(for: kind) : Double(audio.volume(for: kind))
     }
 
     private var audible: Bool {
@@ -30,7 +34,7 @@ struct VolumeLevelBar: View {
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !audible)) { timeline in
             GeometryReader { geo in
-                let fillWidth = max(3, geo.size.width * fraction)
+                let fillWidth = fraction > 0.001 ? max(3, geo.size.width * fraction) : 0
                 ZStack(alignment: .leading) {
                     Capsule()
                         .fill(Color.primary.opacity(0.10))
@@ -50,7 +54,7 @@ struct VolumeLevelBar: View {
             }
         }
         .frame(height: 6)
-        .animation(.spring(response: 0.35), value: fraction)
+        .animation(metering ? nil : .spring(response: 0.35), value: fraction)
         .accessibilityHidden(true)
     }
 

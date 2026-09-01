@@ -4,7 +4,7 @@ cd "$(dirname "$0")/.."
 
 APP="build/macbar.app"
 OUT="dist"
-FINAL="$OUT/macbar-0.1.1-arm64.dmg"
+FINAL="$OUT/macbar-0.2.0-arm64.dmg"
 mkdir -p "$OUT"
 rm -f "$OUT"/*.dmg
 

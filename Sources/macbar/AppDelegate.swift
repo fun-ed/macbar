@@ -98,12 +98,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
             return
         }
         if let last = lastPopoverCloseDate, Date().timeIntervalSince(last) < 0.2 { return }
+        audio.setMeteringActive(true)
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         popover.contentViewController?.view.window?.makeKey()
     }
 
     func popoverDidClose(_ notification: Notification) {
         lastPopoverCloseDate = Date()
+        audio.setMeteringActive(false)
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        audio.setMeteringActive(false)
     }
 
     private func showContextMenu() {
