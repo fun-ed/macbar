@@ -31,6 +31,14 @@
 
 ## 版本歷史
 
+### v0.2 候選（評估中，未拍板不動工）
+
+- 即時聲音 VU 表（真實 loudness，非設定值）：
+  - 麥克風端：需要 capture → 觸發 TCC 麥克風權限，打破 v1「無 TCC」禁區，須使用者明示同意
+  - 喇叭端：macOS 14.4+ CoreAudio process tap（`AudioHardwareCreateProcessTap`）可取系統輸出電平，免 TCC 但需處理 tap 生命週期與常駐功耗；ScreenCaptureKit 會跳出系統錄製授權，不建議
+  - 連帶影響：Info.plist 加 `NSMicrophoneUsageDescription`、權限被拒的降級 UX、常駐 capture 的電量成本
+  - 需人類拍板範圍後才開工
+
 ### v0.1.1（2026-09-02）
 
 - Menubar icon 與 popover 圖示改為「靜音態」語意：mute **或** 音量 0% 都顯示斜線圖示（`speaker.slash` / `mic.slash`），不再讓人誤判為有聲（mic 狀態仍優先）
