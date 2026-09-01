@@ -13,6 +13,7 @@
 swift build -c release                 # 0 錯誤
 file build/macbar.app/Contents/MacOS/macbar   # 必須 arm64
 codesign --verify --strict build/macbar.app   # 簽章通過
+swift Scripts/smoke-coreaudio.swift    # CoreAudio 活體煙囪（set/get/mute/restore，7 項）
 hdiutil attach dist/*.dmg -mountpoint /tmp/macbar-mnt -readonly -nobrowse
 ls /tmp/macbar-mnt/                            # macbar.app + Applications
 codesign --verify --strict /tmp/macbar-mnt/macbar.app
