@@ -14,6 +14,61 @@ struct PopoverView: View {
     }
 }
 
+struct VolumeLevelBar: View {
+    @EnvironmentObject private var audio: AudioController
+    let kind: VolumeKind
+
+    private var fraction: Double {
+        guard audio.isAvailable(kind), audio.hasVolumeControl(kind) else { return 0 }
+        return Double(audio.volume(for: kind))
+    }
+
+    private var audible: Bool {
+        !audio.isMuted(kind) && fraction > 0.005
+    }
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !audible)) { timeline in
+            GeometryReader { geo in
+                let fillWidth = max(3, geo.size.width * fraction)
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.primary.opacity(0.10))
+                    Capsule()
+                        .fill(fillGradient)
+                        .frame(width: fillWidth)
+                        .overlay {
+                            if audible {
+                                Capsule()
+                                    .fill(Color.white.opacity(0.55))
+                                    .frame(width: 16)
+                                    .offset(x: shimmerOffset(in: fillWidth, at: timeline.date))
+                                    .clipped()
+                            }
+                        }
+                }
+            }
+        }
+        .frame(height: 6)
+        .animation(.spring(response: 0.35), value: fraction)
+        .accessibilityHidden(true)
+    }
+
+    private var fillGradient: LinearGradient {
+        LinearGradient(
+            colors: kind == .output
+                ? [Color(red: 0.25, green: 0.55, blue: 1.0), Color(red: 0.35, green: 0.85, blue: 1.0)]
+                : [Color(red: 0.6, green: 0.35, blue: 1.0), Color(red: 0.85, green: 0.45, blue: 1.0)],
+            startPoint: .leading, endPoint: .trailing)
+    }
+
+    private func shimmerOffset(in fillWidth: CGFloat, at date: Date) -> CGFloat {
+        let travel = max(0, fillWidth - 16)
+        let t = date.timeIntervalSinceReferenceDate * 2.4
+        return (sin(t) * 0.5 + 0.5) * travel
+    }
+}
+
 extension View {
     @ViewBuilder
     func symbolBounce<V: Equatable>(value: V) -> some View {
@@ -56,6 +111,7 @@ struct VolumeRow: View {
                 .buttonStyle(.borderless)
                 .disabled(!audio.isAvailable(kind))
             }
+            VolumeLevelBar(kind: kind)
         }
         .disabled(!audio.isAvailable(kind))
     }
