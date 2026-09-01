@@ -16,15 +16,6 @@ struct PopoverView: View {
 
 extension View {
     @ViewBuilder
-    func volumeAnimation(isActive: Bool) -> some View {
-        if #available(macOS 14.0, *) {
-            symbolEffect(.variableColor.iterative, options: .repeating, isActive: isActive)
-        } else {
-            self
-        }
-    }
-
-    @ViewBuilder
     func symbolBounce<V: Equatable>(value: V) -> some View {
         if #available(macOS 14.0, *) {
             symbolEffect(.bounce, value: value)
@@ -41,9 +32,11 @@ struct VolumeRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
-                Image(systemName: leadingSymbol)
-                    .frame(width: 20)
-                    .volumeAnimation(isActive: !isSilent)
+                TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: isSilent)) { timeline in
+                    Image(systemName: leadingSymbol)
+                        .frame(width: 20)
+                        .opacity(iconOpacity(at: timeline.date))
+                }
                 Text(kind == .output ? "Speaker" : "Microphone")
                     .font(.headline)
                 Spacer()
@@ -83,6 +76,12 @@ struct VolumeRow: View {
 
     private var muted: Bool {
         audio.isMuted(kind)
+    }
+
+    private func iconOpacity(at date: Date) -> Double {
+        if isSilent { return 0.45 }
+        let t = date.timeIntervalSinceReferenceDate * 3.0
+        return 0.6 + 0.4 * abs(sin(t))
     }
 
     private var isSilent: Bool {
