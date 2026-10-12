@@ -66,7 +66,13 @@ Manual smoke:
 | 人工功能 | 使用者確認 Firefox 的獨立滑桿與 mute 實際生效、沒有紅字。其餘完整人工煙囪清單尚未逐項取得本版紀錄；不由這項確認推定全部通過。 |
 | 權限與平台 | macOS 13 / 14.3 的實機 fallback，以及系統音訊 TCC 允許、拒絕、撤銷後 Retry 的完整人工矩陣未完成；目前只有本機環境，未驗項保留。 |
 | Firefox、原生輸出與 Boom3D | 已驗證內建輸出上的 Firefox；其他 native output 拓樸矩陣與 Boom3D 完整相容性未驗證。不得宣稱 Boom3D 全相容，也不得由目前觀察推論其驅動必然不相容。 |
-| GitHub 發佈 | Release 建立、tag 目標與 asset 下載 SHA-256 在發佈操作後另行核對。 |
+| GitHub 發佈 | [v0.3.0](https://github.com/fun-ed/macbar/releases/tag/v0.3.0) 已正式發佈，非 draft／prerelease；tag 指向 `a3801d4a02f127c3f6e57675beeaaa06f22afdaf`。已下載 asset，確認版本、簽章與 App 內容，SHA-256 與本機產物一致。 |
+
+發佈 asset 為 `macbar-0.3.0-arm64.dmg`，667,219 bytes：
+
+```text
+5df2b394c29166f58504c2655cb9de8e2e55cd0effc847b8390ecc8caa103ae2  macbar-0.3.0-arm64.dmg
+```
 
 
 ## 簽收紀錄

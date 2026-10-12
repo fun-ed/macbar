@@ -3,6 +3,7 @@
 > 本檔是本專案的單一事實來源（SOT）。任何行為、範圍、打包方式的變更，先改這裡再改程式。
 
 - 版本：v0.3.0
+- 發佈：2026-10-12，[GitHub Release v0.3.0](https://github.com/fun-ed/macbar/releases/tag/v0.3.0)，build 8。
 - 定案日期：2026-09-01
 - 決策過程：grilling 訪談 14 題（Q1–Q14），全數由使用者拍板
 
