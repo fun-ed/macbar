@@ -28,6 +28,7 @@
 | 產物 | `dist/macbar-0.3.0-arm64.dmg` |
 | App icon | 腳本產生：macOS 輪廓圓角方塊漸層底 + 白色喇叭符號，不精雕 |
 | 介面語言 | 英文 |
+| README / Release notes | English 先列，接著提供完整且逐項對應的台灣繁體中文；README 與 GitHub Release notes 一律維持此順序 |
 | 開發工作流 | main 保持乾淨；開發一律在 `../macbar-wt/<branch>` worktree 進行，完成後 merge 回 main 並移除 worktree。實際編碼獨立交給 scoped、可控制的 agents（乾淨上下文、可 eval、可測試），merge 前必須通過驗收清單 |
 | Git 身分 | fun-ed \<50657368+fun-ed@users.noreply.github.com\>（全域設定） |
 

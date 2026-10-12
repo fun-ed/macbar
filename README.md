@@ -1,102 +1,205 @@
 # macbar
 
-macOS menubar 音量控制器：可即時調整預設輸出與輸入，也可獨立控制各 App 的輸出音量與 mute。支援 arm64（Apple Silicon）。
-
 ![](https://img.shields.io/badge/platform-macOS%2013%2B-blue) ![](https://img.shields.io/badge/arch-arm64-blue)
 
-## 功能
+**Languages:** [English](#english) · [台灣繁體中文](#台灣繁體中文)
 
-- 常駐 menubar，popover 提供喇叭、麥克風系統音量與 mute、百分比及 VU bar
-- Applications 清單依正在輸出音訊的 App 分組，提供各 App 輸出音量與 mute；同一 App 的 helper processes 共用控制，排除 macbar
-- 系統音量、mute 與逐 App gain 各自運作；逐 App 控制不改系統主音量或預設輸出
-- 逐 App 音量設為 100% 且未 mute 時使用原始輸出，不建立 route；其餘設定只存在本次執行期間
-- Popover 關閉只停止 VU metering，不停止已套用的逐 App route。回復 100% 未 mute、程序停止或 macbar 退出時釋放 route；輸出裝置改變時會在新輸出重建 route 並重新驗證。
-- 圖示上滾輪調整喇叭系統音量；有聲時圖示呼吸動畫、bar 有流光
-- Mute 或音量 0% 顯示斜線 icon（麥克風狀態優先）
-- 換預設裝置自動跟隨；右鍵選單提供 Launch at Login、Quit；popover 開啟時 Cmd+Q 可退出
+## English
 
-## 權限
+macOS menu-bar volume controller: adjust the default output and input in real time, and independently control each app's output volume and mute. Supports arm64 (Apple Silicon).
 
-| 授權 | 用途 | 拒絕的後果 |
+### Features
+
+- Lives in the menu bar. The popover provides speaker and microphone system volume and mute controls, percentages, and VU bars.
+- The Applications list groups apps currently playing audio and provides per-app output volume and mute controls. Helper processes belonging to the same app share controls; macbar is excluded.
+- System volume and mute are independent of per-app gain. Per-app controls do not change system master volume or the default output.
+- At 100% and unmuted, an app uses the original output without creating a route. Other per-app settings last only for the current run.
+- Closing the popover stops only VU metering, not an active per-app route. A route is released when volume returns to 100% unmuted, the process stops, or macbar quits. When the default output changes, macbar rebuilds and revalidates the route on the new output.
+- Scroll over the menu-bar icon to adjust speaker system volume. The icon breathes while audio is playing, and the bar has a shimmer effect.
+- Mute or 0% volume shows a slashed icon (microphone state takes precedence).
+- Follows changes to the default device. The right-click menu provides Launch at Login and Quit; press Cmd+Q to quit while the popover is open.
+
+### Permissions
+
+| Permission | Purpose | If denied |
 |---|---|---|
-| 麥克風（TCC） | VU bar 量測輸入音量，不錄音 | 麥克風 bar 退回設定值模式 |
-| 系統音訊存取（process tap） | VU bar 量測輸出；v0.3.0 起也用於即時逐 App 音量處理 | 喇叭 bar 退回設定值模式；逐 App route 顯示未套用錯誤，需允許權限並按 Retry |
+| Microphone (TCC) | Measures input volume for the VU bar; does not record audio | The microphone bar falls back to setting-based mode |
+| System audio access (process tap) | Measures output for the VU bar; since v0.3.0, also enables real-time per-app volume processing | The speaker bar falls back to setting-based mode; a per-app route is marked unapplied with an error until access is allowed and Retry is pressed |
 
-- VU speaker tap 與逐 App 音量需要 macOS 14.4+。macOS 13 / 14.3 不支援逐 App 音量，speaker bar 走設定值模式。
-- 若逐 App route 顯示系統音訊權限錯誤，先在「系統設定 → 隱私權與安全性」允許 macbar 的系統音訊存取，讓目標 App 播放音訊，再按 Retry。若出現輸出裝置、driver 或格式／拓樸錯誤，先切換到受支援的輸出後按 Retry。所有錯誤狀態都標示未套用；probe 驗證前維持原始播放。
-- 逐 App tap 只在記憶體中即時處理，不錄音、不存檔，也不擷取麥克風。Boom3D 完整相容性尚未驗證，不保證支援。
+- The speaker VU tap and per-app volume require macOS 14.4+. Per-app volume is unavailable on macOS 13 and 14.3; the speaker bar uses setting-based mode there.
+- If a per-app route reports a system audio permission error, allow macbar under **System Settings → Privacy & Security**, have the target app play audio, then press Retry. For output-device, driver, format, or topology errors, switch to a supported output and press Retry. Error states are always marked unapplied; original playback continues until the probe is validated.
+- Per-app taps process audio in real time in memory only. They do not record or save audio and do not capture the microphone. Full Boom3D compatibility has not been verified and is not guaranteed.
 
-## 安裝
+### Installation
+
+Release asset: [`macbar-0.3.0-arm64.dmg`](https://github.com/fun-ed/macbar/releases/download/v0.3.0/macbar-0.3.0-arm64.dmg).
+
+1. Download and mount the DMG, then drag **macbar.app** into **Applications**.
+2. The app is ad-hoc signed and not notarized. If Gatekeeper blocks it, first try opening the app, then choose `Open Anyway` under **System Settings → Privacy & Security**. Allow it only after confirming that you trust the download source.
+3. Grant access when prompted the first time you use microphone VU metering or a process tap. Per-app volume requires macOS 14.4+.
+
+Running `open build/macbar.app` from a worktree starts only that worktree's test build; it does not replace `/Applications/macbar.app`. To update the installed app, copy or drag the release app into Applications and confirm replacement.
+
+### Known limitations
+
+- A per-app route supports only one physical subdevice, one Float32 output stream with 1–32 channels, one stereo Float32 tap, and a matching sample rate. Other topologies are rejected, and the original output should remain available.
+- Per-app behavior on macOS 13 / 14.3 and the complete manual matrix for revoking system audio access after it has been granted have not been verified. Full Boom3D compatibility is unverified and not guaranteed; current observations are insufficient to determine its cause or compatibility level.
+
+### Build (local)
+
+Requirements: macOS 13+, Apple Silicon, and the Xcode toolchain (Swift 6 compiler).
+
+```bash
+swift build -c release      # pure build; output: .build/release/macbar
+./Scripts/make-app.sh       # assemble build/macbar.app (icon + Info.plist + ad-hoc signature)
+./Scripts/make-dmg.sh       # create dist/macbar-0.3.0-arm64.dmg
+open dist/macbar-0.3.0-arm64.dmg
+```
+
+### Debug
+
+```bash
+# check whether the app is running
+pgrep -x macbar
+
+# app logs (check here first for immediate exit or listener errors)
+log show --predicate 'process == "macbar"' --last 5m
+
+# CoreAudio live smoke test (7 checks: set/get/mute/restore)
+swift Scripts/smoke-coreaudio.swift
+```
+
+VU bars not moving? Check **System Settings → Privacy & Security → Microphone / System Audio Recording** and confirm macbar is allowed.
+See `docs/MAINTENANCE.md` (§ troubleshooting) for common symptoms.
+If the scroll direction is reversed, change the sign in `handleScroll` in `Sources/macbar/AppDelegate.swift`.
+
+### Development
+
+#### Development documents
+
+| File | Contents |
+|---|---|
+| `PLAN.md` | Single source of truth (SOT): decision table, version history, and acceptance checklist |
+| `docs/ARCHITECTURE.md` | Module responsibilities, per-app audio data flow, and VU/mixer lifecycle |
+| `CHANGELOG.md` | Features and support boundaries by version |
+| `docs/DEVELOPMENT.md` | Architecture, CoreAudio rules, and build instructions |
+| `docs/MAINTENANCE.md` | Version upgrade process, known boundaries, and troubleshooting |
+| `docs/AI-DEVELOPMENT.md` | Agent development constraints and definition of done |
+| `docs/REVIEW-TEST.md` | Review levels and Eval/Test checklist |
+| `docs/ACCEPTANCE.md` | Acceptance procedure and evidence format |
+| `docs/PR-HANDOFF.md` | Branches, required PR contents, and merge rules |
+
+#### Commit and push rules
+
+- Conventional commits: `feat:` / `fix:` / `docs:` / `build:` / `chore:`
+- Never add `Co-Authored-By` or any AI-generated marker.
+- `git push` requires explicit human direction; never push automatically.
+- Change behavior in `PLAN.md` (the SOT) first, then update the code.
+
+### Author
+
+fun-ed &lt;50657368+fun-ed@users.noreply.github.com&gt;
+
+### License
+
+[MIT](LICENSE)
+
+## 台灣繁體中文
+
+macOS 選單列音量控制器：可即時調整預設輸出與輸入，也可獨立控制各 App 的輸出音量與 mute。支援 arm64（Apple Silicon）。
+
+### 功能
+
+- 常駐選單列；popover 提供喇叭與麥克風系統音量、mute、百分比及 VU bar。
+- Applications 清單依正在播放音訊的 App 分組，提供各 App 輸出音量與 mute；同一 App 的 helper processes 共用控制，排除 macbar。
+- 系統音量與 mute 和逐 App gain 各自獨立；逐 App 控制不改系統主音量或預設輸出。
+- 音量為 100% 且未 mute 時使用原始輸出，不建立 route；其他逐 App 設定只保留在本次執行期間。
+- 關閉 popover 只會停止 VU metering，不會停止已套用的逐 App route。音量回到 100% 且未 mute、程序停止或 macbar 退出時會釋放 route。預設輸出改變時，會在新輸出重建 route 並重新驗證。
+- 在選單列圖示上滾動可調整喇叭系統音量；有聲時圖示會呼吸，bar 會顯示流光效果。
+- Mute 或音量 0% 時顯示斜線圖示（麥克風狀態優先）。
+- 自動跟隨預設裝置；右鍵選單提供 Launch at Login 與 Quit；popover 開啟時可按 Cmd+Q 退出。
+
+### 權限
+
+| 權限 | 用途 | 拒絕時的影響 |
+|---|---|---|
+| 麥克風（TCC） | 量測 VU bar 的輸入音量，不錄音 | 麥克風 bar 退回設定值模式 |
+| 系統音訊存取（process tap） | 量測 VU bar 的輸出；自 v0.3.0 起也用於即時逐 App 音量處理 | 喇叭 bar 退回設定值模式；逐 App route 標示未套用並顯示錯誤，需允許權限後按 Retry |
+
+- 喇叭 VU tap 與逐 App 音量需要 macOS 14.4+。macOS 13 與 14.3 無法使用逐 App 音量；喇叭 bar 在這些版本使用設定值模式。
+- 若逐 App route 顯示系統音訊權限錯誤，請在「系統設定 → 隱私權與安全性」允許 macbar，讓目標 App 播放音訊，再按 Retry。若是輸出裝置、driver、格式或拓樸錯誤，請切換到支援的輸出後按 Retry。錯誤狀態一律標示為未套用；probe 驗證前會維持原始播放。
+- 逐 App tap 只在記憶體中即時處理音訊，不錄音、不存檔，也不擷取麥克風。Boom3D 完整相容性尚未驗證，不保證支援。
+
+### 安裝
 
 Release asset：[`macbar-0.3.0-arm64.dmg`](https://github.com/fun-ed/macbar/releases/download/v0.3.0/macbar-0.3.0-arm64.dmg)。
 
-1. 下載並掛載 DMG，把 **macbar.app** 拖進 **Applications**。
-2. App 使用 ad-hoc 簽章，未經 notarization。若 Gatekeeper 阻擋，先嘗試開啟 app，再到「系統設定 → 隱私權與安全性」選擇 `Open Anyway`。確認下載來源可信後才允許開啟。
-3. 首次使用麥克風 VU 或 process tap 時，依系統提示授權。逐 App 功能需要 macOS 14.4+。
+1. 下載並掛載 DMG，將 **macbar.app** 拖入 **Applications**。
+2. App 使用 ad-hoc 簽章，未經 notarization。若 Gatekeeper 阻擋，先嘗試開啟 app，再到「系統設定 → 隱私權與安全性」選擇 `Open Anyway`。確認信任下載來源後才允許開啟。
+3. 首次使用麥克風 VU metering 或 process tap 時，依提示授權。逐 App 音量需要 macOS 14.4+。
 
-從工作樹執行 `open build/macbar.app` 只會啟動該工作樹的測試版，不會取代 `/Applications/macbar.app`。要更新 Applications 中的版本，需把發布版 app 複製或拖入 Applications 並確認替換。
+從 worktree 執行 `open build/macbar.app` 只會啟動該 worktree 的測試版，不會取代 `/Applications/macbar.app`。要更新已安裝的 App，需把 release app 複製或拖入 Applications 並確認替換。
 
-## 已知限制
+### 已知限制
 
-- 逐 App route 只接受單一實體 subdevice、一條 1–32 聲道 Float32 輸出 stream、一個 stereo Float32 tap，且 sample rate 相同。其他 topology 會拒絕 route，原始輸出應保持可用。
-- macOS 13 / 14.3 的逐 App 行為，以及系統音訊授權已允許後再撤銷的完整人工矩陣尚未驗證。Boom3D 完整相容性未驗證，不保證支援；目前觀察不足以判定其原因或相容程度。
+- 逐 App route 僅支援單一實體 subdevice、一條 1–32 聲道 Float32 輸出 stream、一個 stereo Float32 tap，且 sample rate 相同。其他拓樸會拒絕 route，原始輸出應保持可用。
+- macOS 13 / 14.3 的逐 App 行為，以及系統音訊存取已允許後再撤銷的完整人工測試矩陣尚未驗證。Boom3D 完整相容性未驗證且不保證支援；目前觀察不足以判定原因或相容程度。
 
-## Build（本機）
+### 本機建置
 
 需求：macOS 13+、Apple Silicon、Xcode 工具鏈（Swift 6 compiler）。
 
 ```bash
-swift build -c release      # 純建置，產物 .build/release/macbar
-./Scripts/make-app.sh       # 組 build/macbar.app（icon + Info.plist + ad-hoc 簽章）
-./Scripts/make-dmg.sh       # 產 dist/macbar-0.3.0-arm64.dmg
+swift build -c release      # 純建置；產物：.build/release/macbar
+./Scripts/make-app.sh       # 組成 build/macbar.app（icon + Info.plist + ad-hoc 簽章）
+./Scripts/make-dmg.sh       # 產生 dist/macbar-0.3.0-arm64.dmg
 open dist/macbar-0.3.0-arm64.dmg
 ```
 
-
-## Debug
+### 除錯
 
 ```bash
-# app 是否活著
+# 確認 app 是否正在執行
 pgrep -x macbar
 
-# app 日誌（啟動即退、listener 錯誤先看這裡）
+# app 日誌（立即退出或 listener 錯誤時先查看）
 log show --predicate 'process == "macbar"' --last 5m
 
-# CoreAudio 活體煙囪測試（7 項，set/get/mute/restore）
+# CoreAudio 即時 smoke test（7 項：set/get/mute/restore）
 swift Scripts/smoke-coreaudio.swift
 ```
 
-VU 表不動？檢查「系統設定 → 隱私權與安全性 → 麥克風 / 系統音訊錄製」是否允許 macbar。
-常見症狀對照表見 `docs/MAINTENANCE.md`（§疑難排解）。
-滾輪方向若與預期相反：改 `Sources/macbar/AppDelegate.swift` 的 `handleScroll` 正負號。
+VU bar 沒有動？請檢查「系統設定 → 隱私權與安全性 → 麥克風 / 系統音訊錄製」是否允許 macbar。
+常見症狀請參閱 `docs/MAINTENANCE.md`（§疑難排解）。
+若滾輪方向相反，請修改 `Sources/macbar/AppDelegate.swift` 中 `handleScroll` 的正負號。
 
-## 開發
+### 開發
 
-### 開發文件
+#### 開發文件
 
 | 文件 | 內容 |
 |---|---|
-| `PLAN.md` | 設計單一事實來源（SOT），決策總表 + 版本歷史 + 驗收清單 |
+| `PLAN.md` | 單一事實來源（SOT）：決策總表、版本歷史與驗收清單 |
 | `docs/ARCHITECTURE.md` | 模組職責、逐 App 音訊資料流、VU 與 mixer 生命週期 |
 | `CHANGELOG.md` | 按版本整理的功能與支援邊界 |
-| `docs/DEVELOPMENT.md` | 架構、CoreAudio 規則、建置 |
-| `docs/MAINTENANCE.md` | 版本升級流程、已知邊界、疑難排解 |
-| `docs/AI-DEVELOPMENT.md` | agent 開發約束與 DoD |
-| `docs/REVIEW-TEST.md` | Review 分級、Eval/Test 清單 |
+| `docs/DEVELOPMENT.md` | 架構、CoreAudio 規則與建置說明 |
+| `docs/MAINTENANCE.md` | 版本升級流程、已知邊界與疑難排解 |
+| `docs/AI-DEVELOPMENT.md` | agent 開發約束與完成定義 |
+| `docs/REVIEW-TEST.md` | Review 分級與 Eval/Test 清單 |
 | `docs/ACCEPTANCE.md` | 驗收程序與證據格式 |
-| `docs/PR-HANDOFF.md` | 分支、PR 必備內容、merge 規則 |
+| `docs/PR-HANDOFF.md` | 分支、PR 必備內容與 merge 規則 |
 
-### Commit 與 Push 規則
+#### Commit 與 Push 規則
 
 - Conventional commits：`feat:` / `fix:` / `docs:` / `build:` / `chore:`
-- **一律不加 Co-Authored-By 或任何 AI 產生標記**
-- `git push` 需人類明確指示，不自動推
-- 改行為先改 `PLAN.md`（SOT），程式跟著改
+- 一律不加 `Co-Authored-By` 或任何 AI 產生標記。
+- `git push` 需人類明確指示，不自動推送。
+- 改變行為前先修改 `PLAN.md`（SOT），再更新程式。
 
-## 作者
+### 作者
 
 fun-ed &lt;50657368+fun-ed@users.noreply.github.com&gt;
 
-## License
+### 授權條款
 
 [MIT](LICENSE)

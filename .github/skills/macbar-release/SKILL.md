@@ -32,10 +32,12 @@ swift Scripts/smoke-coreaudio.swift        # 7/7 PASS
 git tag vX.Y.Z && git push origin vX.Y.Z
 gh release create vX.Y.Z dist/macbar-X.Y.Z-arm64.dmg \
   --title "macbar vX.Y.Z" \
-  --notes-file <(生成自 PLAN.md 版本歷史對應段落)
+  --notes-file <(依下列 Changelog 規則產生完整雙語正文)
 ```
 
-Changelog 直接取 `PLAN.md` 該版本段落（SOT），轉成 markdown bullet。首次 release 需涵蓋先前版本。
+以 `PLAN.md` 對應版本的「版本歷史」段落為單一事實來源，擷取該版本事實並整理為 Markdown bullet。首次 release 需涵蓋先前版本。
+Release notes 固定先放完整的 `## English` 區塊，再放完整且逐項對應的 `## 台灣繁體中文` 區塊。先忠實翻譯 PLAN 的事實寫出英文，不要只複製中文 PLAN；繁體中文區塊要與英文內容對應。
+產生後讀回 notes，確認語言順序、兩區塊內容對應，且條件、限制、風險、rollback、已驗證／未驗證邊界與安裝及 checksum 資訊一致；不得把未驗證項目寫成已通過。
 
 ## 5. 事後
 
