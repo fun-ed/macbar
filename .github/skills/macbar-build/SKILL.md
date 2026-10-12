@@ -19,4 +19,4 @@ All four commands must pass. On failure, fix at the source; never hand-patch bui
 Rules:
 - No third-party dependencies; pure SwiftPM.
 - Swift language mode 5 (Package.swift `swift-tools-version:5.9`).
-- Never add TCC usage or sandbox entitlements.
+- Do not add TCC usage beyond uses explicitly approved in `PLAN.md`; do not add sandbox entitlements.

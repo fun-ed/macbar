@@ -5,6 +5,7 @@ import ServiceManagement
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopoverDelegate {
     private let audio = AudioController()
+    private let appAudio = AppAudioController()
     private let popover = NSPopover()
     private var statusItem: NSStatusItem?
     private var keyMonitor: Any?
@@ -16,9 +17,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
         statusItem = item
 
         popover.behavior = .transient
-        popover.contentSize = NSSize(width: 300, height: 140)
-        popover.contentViewController = NSHostingController(rootView: PopoverView().environmentObject(audio))
+        popover.contentSize = NSSize(width: 300, height: 520)
+        popover.contentViewController = NSHostingController(rootView: PopoverView()
+            .environmentObject(audio)
+            .environmentObject(appAudio))
         popover.delegate = self
+        appAudio.start()
 
         if let button = item.button {
             button.target = self
@@ -110,6 +114,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
 
     func applicationWillTerminate(_ notification: Notification) {
         audio.setMeteringActive(false)
+        appAudio.stop()
     }
 
     private func showContextMenu() {

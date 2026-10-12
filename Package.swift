@@ -9,7 +9,18 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "macbar",
+            dependencies: ["AppAudioRT"],
             path: "Sources/macbar"
+        ),
+        .target(
+            name: "AppAudioRT",
+            path: "Sources/AppAudioRT",
+            publicHeadersPath: "include"
+        ),
+        .testTarget(
+            name: "macbarTests",
+            dependencies: ["macbar", "AppAudioRT"],
+            path: "Tests/macbarTests"
         )
     ]
 )
