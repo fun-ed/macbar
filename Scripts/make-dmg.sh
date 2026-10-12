@@ -4,12 +4,12 @@ cd "$(dirname "$0")/.."
 
 APP="build/macbar.app"
 OUT="dist"
-FINAL="$OUT/macbar-0.2.0-arm64.dmg"
+FINAL="$OUT/macbar-0.3.0-arm64.dmg"
 mkdir -p "$OUT"
 rm -f "$OUT"/*.dmg
 
 if npx --yes create-dmg "$APP" "$OUT" --overwrite; then
-    mv "$OUT/macbar 0.1.0.dmg" "$FINAL"
+    mv "$OUT/macbar 0.3.0.dmg" "$FINAL"
 else
     echo "create-dmg failed, falling back to hdiutil" >&2
     rm -f "$OUT/macbar "*.dmg

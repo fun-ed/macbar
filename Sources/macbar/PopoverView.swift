@@ -8,9 +8,11 @@ struct PopoverView: View {
             VolumeRow(kind: .output)
             Divider()
             VolumeRow(kind: .input)
+            Divider()
+            ApplicationsVolumeView()
         }
         .padding(16)
-        .frame(width: 300)
+        .frame(width: 300, height: 520, alignment: .top)
     }
 }
 
