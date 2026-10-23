@@ -25,8 +25,8 @@ cat > "$APP/Contents/Info.plist" <<'PLIST_EOF'
     <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
     <key>CFBundleName</key><string>macbar</string>
     <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>0.3.0</string>
-    <key>CFBundleVersion</key><string>8</string>
+    <key>CFBundleShortVersionString</key><string>0.3.1</string>
+    <key>CFBundleVersion</key><string>9</string>
     <key>LSMinimumSystemVersion</key><string>13.0</string>
     <key>LSUIElement</key><true/>
     <key>NSAudioCaptureUsageDescription</key><string>macbar needs system audio access to show the live output level and control individual application volumes. Audio is processed live and never recorded.</string>
