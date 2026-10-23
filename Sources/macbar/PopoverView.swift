@@ -29,30 +29,15 @@ struct VolumeLevelBar: View {
         return metering ? audio.level(for: kind) : Double(audio.volume(for: kind))
     }
 
-    private var audible: Bool {
-        !audio.isMuted(kind) && fraction > 0.005
-    }
-
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !audible)) { timeline in
-            GeometryReader { geo in
-                let fillWidth = fraction > 0.001 ? max(3, geo.size.width * fraction) : 0
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(Color.primary.opacity(0.10))
-                    Capsule()
-                        .fill(fillGradient)
-                        .frame(width: fillWidth)
-                        .overlay {
-                            if audible {
-                                Capsule()
-                                    .fill(Color.white.opacity(0.55))
-                                    .frame(width: 16)
-                                    .offset(x: shimmerOffset(in: fillWidth, at: timeline.date))
-                                    .clipped()
-                            }
-                        }
-                }
+        GeometryReader { geo in
+            let fillWidth = fraction > 0.001 ? max(3, geo.size.width * fraction) : 0
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color.primary.opacity(0.10))
+                Capsule()
+                    .fill(fillGradient)
+                    .frame(width: fillWidth)
             }
         }
         .frame(height: 6)
@@ -66,13 +51,6 @@ struct VolumeLevelBar: View {
                 ? [Color(red: 0.25, green: 0.55, blue: 1.0), Color(red: 0.35, green: 0.85, blue: 1.0)]
                 : [Color(red: 0.6, green: 0.35, blue: 1.0), Color(red: 0.85, green: 0.45, blue: 1.0)],
             startPoint: .leading, endPoint: .trailing)
-    }
-
-    private func shimmerOffset(in fillWidth: CGFloat, at date: Date) -> CGFloat {
-        let travel = max(0, fillWidth + 16)
-        let t = date.timeIntervalSinceReferenceDate * 1.6
-        let phase = t.truncatingRemainder(dividingBy: 2.0) / 2.0
-        return phase * travel - 16
     }
 }
 
@@ -94,11 +72,9 @@ struct VolumeRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
-                TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: isSilent)) { timeline in
-                    Image(systemName: leadingSymbol)
-                        .frame(width: 20)
-                        .opacity(iconOpacity(at: timeline.date))
-                }
+                Image(systemName: leadingSymbol)
+                    .frame(width: 20)
+                    .opacity(isSilent ? 0.45 : 1.0)
                 Text(kind == .output ? "Speaker" : "Microphone")
                     .font(.headline)
                 Spacer()
@@ -139,12 +115,6 @@ struct VolumeRow: View {
 
     private var muted: Bool {
         audio.isMuted(kind)
-    }
-
-    private func iconOpacity(at date: Date) -> Double {
-        if isSilent { return 0.45 }
-        let t = date.timeIntervalSinceReferenceDate * 3.0
-        return 0.6 + 0.4 * abs(sin(t))
     }
 
     private var isSilent: Bool {

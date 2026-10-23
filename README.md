@@ -15,7 +15,9 @@ macOS menu-bar volume controller: adjust the default output and input in real ti
 - System volume and mute are independent of per-app gain. Per-app controls do not change system master volume or the default output.
 - At 100% and unmuted, an app uses the original output without creating a route. Other per-app settings last only for the current run.
 - Closing the popover stops only VU metering, not an active per-app route. A route is released when volume returns to 100% unmuted, the process stops, or macbar quits. When the default output changes, macbar rebuilds and revalidates the route on the new output.
-- Scroll over the menu-bar icon to adjust speaker system volume. The icon breathes while audio is playing, and the bar has a shimmer effect.
+- Scroll over the menu-bar icon to adjust speaker system volume. Popover icons are static, with no breathing or bar shimmer; real VU bars remain.
+- While the popover is open, VU levels publish at most every 500 ms, or 2 Hz. Each eligible publication uses the maximum incoming RMS-mapped level since the previous eligible publication, not a waveform peak. Fast attack and time-based release remain; reset clears accumulated levels, and repeated zero updates are suppressed.
+- Slider and mute actions remain immediate. Audio sample rate, capture callbacks, RMS stride, mapping and sensitivity, per-app routes, and the 250 ms health/discovery timer are unchanged. No new dependencies or TCC permissions are added.
 - Mute or 0% volume shows a slashed icon (microphone state takes precedence).
 - Follows changes to the default device. The right-click menu provides Launch at Login and Quit; press Cmd+Q to quit while the popover is open.
 
@@ -32,7 +34,13 @@ macOS menu-bar volume controller: adjust the default output and input in real ti
 
 ### Installation
 
-Release asset: [`macbar-0.3.0-arm64.dmg`](https://github.com/fun-ed/macbar/releases/download/v0.3.0/macbar-0.3.0-arm64.dmg).
+v0.3.1 / build 9; release asset: [`macbar-0.3.1-arm64.dmg`](https://github.com/fun-ed/macbar/releases/download/v0.3.1/macbar-0.3.1-arm64.dmg). See `PLAN.md` for current publication status.
+
+Asset size: 688,443 bytes. SHA-256 of the locally verified DMG:
+
+```text
+7e6d2103d95cc7740a8f022a1735db84ccb87cb031c1cfd46c839066af9dd73a  macbar-0.3.1-arm64.dmg
+```
 
 1. Download and mount the DMG, then drag **macbar.app** into **Applications**.
 2. The app is ad-hoc signed and not notarized. If Gatekeeper blocks it, first try opening the app, then choose `Open Anyway` under **System Settings → Privacy & Security**. Allow it only after confirming that you trust the download source.
@@ -40,20 +48,23 @@ Release asset: [`macbar-0.3.0-arm64.dmg`](https://github.com/fun-ed/macbar/relea
 
 Running `open build/macbar.app` from a worktree starts only that worktree's test build; it does not replace `/Applications/macbar.app`. To update the installed app, copy or drag the release app into Applications and confirm replacement.
 
+To roll back, reinstall the asset from [v0.3.0](https://github.com/fun-ed/macbar/releases/tag/v0.3.0). The existing v0.3.0 tag remains unchanged.
+
 ### Known limitations
 
 - A per-app route supports only one physical subdevice, one Float32 output stream with 1–32 channels, one stereo Float32 tap, and a matching sample rate. Other topologies are rejected, and the original output should remain available.
 - Per-app behavior on macOS 13 / 14.3 and the complete manual matrix for revoking system audio access after it has been granted have not been verified. Full Boom3D compatibility is unverified and not guaranteed; current observations are insufficient to determine its cause or compatibility level.
+- The macOS 13 / 14.3 fallback, full TCC, Boom3D, and hardware matrix have not been rerun for v0.3.1.
 
 ### Build (local)
 
-Requirements: macOS 13+, Apple Silicon, and the Xcode toolchain (Swift 6 compiler).
+Requirements: macOS 13+, Apple Silicon, and the Xcode toolchain (Swift 6 compiler). DMG packaging invokes `npx` through `mise exec --` and requires mise with Node.js/npm available.
 
 ```bash
 swift build -c release      # pure build; output: .build/release/macbar
 ./Scripts/make-app.sh       # assemble build/macbar.app (icon + Info.plist + ad-hoc signature)
-./Scripts/make-dmg.sh       # create dist/macbar-0.3.0-arm64.dmg
-open dist/macbar-0.3.0-arm64.dmg
+./Scripts/make-dmg.sh       # create dist/macbar-0.3.1-arm64.dmg
+open dist/macbar-0.3.1-arm64.dmg
 ```
 
 ### Debug
@@ -115,7 +126,9 @@ macOS 選單列音量控制器：可即時調整預設輸出與輸入，也可�
 - 系統音量與 mute 和逐 App gain 各自獨立；逐 App 控制不改系統主音量或預設輸出。
 - 音量為 100% 且未 mute 時使用原始輸出，不建立 route；其他逐 App 設定只保留在本次執行期間。
 - 關閉 popover 只會停止 VU metering，不會停止已套用的逐 App route。音量回到 100% 且未 mute、程序停止或 macbar 退出時會釋放 route。預設輸出改變時，會在新輸出重建 route 並重新驗證。
-- 在選單列圖示上滾動可調整喇叭系統音量；有聲時圖示會呼吸，bar 會顯示流光效果。
+- 在選單列圖示上滾動可調整喇叭系統音量；popover 圖示使用靜態顯示，不再呼吸或顯示 bar 流光，保留真實 VU bar。
+- Popover 開啟時，VU level 最多每 500 ms 發布一次，也就是 2 Hz。每次符合發布間隔時，使用前次符合間隔後收到的 RMS 映射 level 最大值，不是波形峰值。保留快速 attack 與時間式 release；reset 清除累積值，並抑制重複零值更新。
+- 滑桿與 mute 操作仍即時生效。音訊 sample rate、capture callbacks、RMS stride、映射與靈敏度、逐 App routes 及 250 ms health／discovery timer 不變。不新增相依或 TCC 權限。
 - Mute 或音量 0% 時顯示斜線圖示（麥克風狀態優先）。
 - 自動跟隨預設裝置；右鍵選單提供 Launch at Login 與 Quit；popover 開啟時可按 Cmd+Q 退出。
 
@@ -132,7 +145,13 @@ macOS 選單列音量控制器：可即時調整預設輸出與輸入，也可�
 
 ### 安裝
 
-Release asset：[`macbar-0.3.0-arm64.dmg`](https://github.com/fun-ed/macbar/releases/download/v0.3.0/macbar-0.3.0-arm64.dmg)。
+v0.3.1 / build 9；release asset：[`macbar-0.3.1-arm64.dmg`](https://github.com/fun-ed/macbar/releases/download/v0.3.1/macbar-0.3.1-arm64.dmg)。目前發佈狀態見 `PLAN.md`。
+
+Asset 大小：688,443 bytes。本機已驗證 DMG 的 SHA-256：
+
+```text
+7e6d2103d95cc7740a8f022a1735db84ccb87cb031c1cfd46c839066af9dd73a  macbar-0.3.1-arm64.dmg
+```
 
 1. 下載並掛載 DMG，將 **macbar.app** 拖入 **Applications**。
 2. App 使用 ad-hoc 簽章，未經 notarization。若 Gatekeeper 阻擋，先嘗試開啟 app，再到「系統設定 → 隱私權與安全性」選擇 `Open Anyway`。確認信任下載來源後才允許開啟。
@@ -140,20 +159,23 @@ Release asset：[`macbar-0.3.0-arm64.dmg`](https://github.com/fun-ed/macbar/rele
 
 從 worktree 執行 `open build/macbar.app` 只會啟動該 worktree 的測試版，不會取代 `/Applications/macbar.app`。要更新已安裝的 App，需把 release app 複製或拖入 Applications 並確認替換。
 
+若需回退，請重新安裝 [v0.3.0](https://github.com/fun-ed/macbar/releases/tag/v0.3.0) 的 asset。既有 v0.3.0 tag 保持不變。
+
 ### 已知限制
 
 - 逐 App route 僅支援單一實體 subdevice、一條 1–32 聲道 Float32 輸出 stream、一個 stereo Float32 tap，且 sample rate 相同。其他拓樸會拒絕 route，原始輸出應保持可用。
 - macOS 13 / 14.3 的逐 App 行為，以及系統音訊存取已允許後再撤銷的完整人工測試矩陣尚未驗證。Boom3D 完整相容性未驗證且不保證支援；目前觀察不足以判定原因或相容程度。
+- v0.3.1 尚未重跑 macOS 13 / 14.3 fallback、完整 TCC、Boom3D 與硬體矩陣。
 
 ### 本機建置
 
-需求：macOS 13+、Apple Silicon、Xcode 工具鏈（Swift 6 compiler）。
+需求：macOS 13+、Apple Silicon、Xcode 工具鏈（Swift 6 compiler）。DMG 封裝透過 `mise exec --` 執行 `npx`，需要 mise 與可用的 Node.js/npm。
 
 ```bash
 swift build -c release      # 純建置；產物：.build/release/macbar
 ./Scripts/make-app.sh       # 組成 build/macbar.app（icon + Info.plist + ad-hoc 簽章）
-./Scripts/make-dmg.sh       # 產生 dist/macbar-0.3.0-arm64.dmg
-open dist/macbar-0.3.0-arm64.dmg
+./Scripts/make-dmg.sh       # 產生 dist/macbar-0.3.1-arm64.dmg
+open dist/macbar-0.3.1-arm64.dmg
 ```
 
 ### 除錯

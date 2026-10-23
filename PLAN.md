@@ -2,8 +2,8 @@
 
 > 本檔是本專案的單一事實來源（SOT）。任何行為、範圍、打包方式的變更，先改這裡再改程式。
 
-- 版本：v0.3.0
-- 發佈：2026-10-12，[GitHub Release v0.3.0](https://github.com/fun-ed/macbar/releases/tag/v0.3.0)，build 8。
+- 版本：v0.3.1，build 9
+- 發佈狀態：READY（2026-10-23），可進行正式發佈，尚未發佈；本版測試、release build、簽章、smoke、獨立複審與本機 DMG 驗證通過。使用者明確選擇「保留未驗項，正式發佈」，豁免未完成人工驗收，不代表人工 PASS。GitHub Release 建立與重新下載驗證待完成。前版為 [v0.3.0](https://github.com/fun-ed/macbar/releases/tag/v0.3.0)。
 - 定案日期：2026-09-01
 - 決策過程：grilling 訪談 14 題（Q1–Q14），全數由使用者拍板
 
@@ -25,14 +25,34 @@
 | 持久化 | UserDefaults：系統軟體 mute 旗標、mute 前音量；逐 App 音量與 mute 只保留在當次執行記憶體 |
 | 簽章 | ad-hoc（無開發者帳號；首次開啟需右鍵「打開」） |
 | DMG | create-dmg 產製（背景圖 + Applications 捷徑），失敗時後備 hdiutil 純壓縮 |
-| 產物 | `dist/macbar-0.3.0-arm64.dmg` |
+| 產物 | `dist/macbar-0.3.1-arm64.dmg`（本機封裝與唯讀掛載驗證通過；688,443 bytes，SHA-256 見 `docs/ACCEPTANCE.md`） |
 | App icon | 腳本產生：macOS 輪廓圓角方塊漸層底 + 白色喇叭符號，不精雕 |
 | 介面語言 | 英文 |
 | README / Release notes | English 先列，接著提供完整且逐項對應的台灣繁體中文；README 與 GitHub Release notes 一律維持此順序 |
 | 開發工作流 | main 保持乾淨；開發一律在 `../macbar-wt/<branch>` worktree 進行，完成後 merge 回 main 並移除 worktree。實際編碼獨立交給 scoped、可控制的 agents（乾淨上下文、可 eval、可測試），merge 前必須通過驗收清單 |
 | Git 身分 | fun-ed \<50657368+fun-ed@users.noreply.github.com\>（全域設定） |
 
+## 輕量化介面（分階段）
+
+- Stage 1：Popover 圖示使用靜態明暗，不再持續呼吸；移除 VU bar 的裝飾流光，保留真實 VU、漸層、既有版面、控制項與輔助使用設定。Mute 與音量 0% 的斜線圖示、mute 按鈕的紅色區別，以及使用者操作觸發的短暫 bounce 與設定值 spring 回饋維持不變。
+- VU 只在 popover 開啟時量測，關閉即停止；逐 App mixer 與已套用 route 不受影響。
+- Stage 2：VU level 發布頻率上限降至 2 Hz（每 500 ms）。每次符合發布間隔時，使用前次符合間隔後收到的 RMS 映射 level 最大值作為目標，避免短暫有聲被節流丟棄；這不是波形峰值，RMS 映射不變。視窗消耗後與 reset 時清除累積值。
+- Attack 立即跟上較高目標；release 保留 0.12 秒時間常數，以 `target + (previous - target) * exp(-dt / releaseTime)` 向較低目標衰減。僅在視窗目標為零且衰減值低於 0.015 時歸零。抑制初始與持續靜音的重複零值發布，保留首次歸零、重複正值、靜音後恢復有聲、節流時間記帳與 reset 後更新。
+- 音訊格式、sample rate、RMS 取樣與映射、VU 靈敏度、音訊 callback、音訊引擎、route、250 ms route health timer、App discovery 與 UI 音量／mute 輸入行為不變。
+- 歷史驗證紀錄（15 Hz 階段，parent 實測；不是 500 ms 版本的驗證）：`swift test` 全部 25 項通過（新增 4 項 LevelMeter + 既有 21 項）；`Scripts/make-app.sh` release app 建置、arm64、strict codesign 與 diff check 通過。同一 no-capture/no-route harness 的 animation-only A/B CPU 為 visible-no-capture 20 秒舊版 5.101%、新版 0.282%，hidden-no-route 60 秒舊版 4.423%、新版 0.277%；包含未變動的 AppAudioController timer/discovery，未擷取音訊、未調整音量，也未量測 active routes，不得推論實際 active-route CPU。該階段未重新驗證 live VU、active route、人工 TCC、舊版 OS 與 release DMG；最終 500 ms 版本的證據另列於下方，不由此歷史紀錄推定。
+
 ## 版本歷史
+### v0.3.1 輕量化介面（2026-10-23，READY，尚未發佈）
+
+- 移除 popover 圖示呼吸與 bar 流光，保留靜態 mute 區別、真實 VU 與原有控制。VU 只在 popover 開啟時運作；滑桿與 mute 操作仍即時生效。
+- VU 最多每 500 ms 發布一次（2 Hz），取前次符合發布間隔後收到的 RMS 映射 level 最大值，不是波形峰值。保留快速 attack 與時間式 release；消耗視窗或 reset 後清除累積值，抑制重複零值並保留有聲轉無聲的首次歸零。
+- 音訊 sample rate、capture callbacks、RMS stride／映射／靈敏度、逐 App routes 與 250 ms health／discovery timer 不變。不新增相依或 TCC 用途。
+- CPU 證據僅限上方 animation-only、無擷取與無 route 的同條件 A/B；不是最終 500 ms VU 版本的效能量測，不保證實際音訊使用時的 CPU。
+- 版本資訊為 `CFBundleShortVersionString` 0.3.1、`CFBundleVersion` 9。2026-10-23 `swift test` 全部 29 項通過（8 項 LevelMeter XCTest + 既有 21 項）；release build、arm64、strict codesign 與獨立程式碼快照複審 PASS。
+- `Scripts/smoke-coreaudio.swift` 7/7 PASS，輸出音量與 mute 原值已還原。`dist/macbar-0.3.1-arm64.dmg` 因 create-dmg 簽章身分不可用，經既有 hdiutil 後備成功產製；唯讀掛載、Applications 捷徑指向 `/Applications`、掛載 App 的 0.3.1 / build 9 與簽章均 PASS，完整 App 檔案 SHA manifest 與 build 逐位元組一致。大小與 SHA-256 見 `docs/ACCEPTANCE.md`。
+- 使用者在得知 29 項測試、7 項 smoke 與 DMG 驗證通過，以及缺少最終 500 ms 人工觀察與完整矩陣後，於 2026-10-23 明確選擇「保留未驗項，正式發佈」。本版 live VU、逐 App／生命週期人工操作、完整 TCC、macOS 13 / 14.3、Boom3D 與硬體矩陣仍未驗，人工驗收予以豁免，不標成 PASS。GitHub Release 建立與重新下載 checksum 驗證待完成。
+- 維持 ad-hoc、未 notarized；未新增 live VU 或 active-route CPU 量測。已安裝的 `/Applications/macbar.app` 未動。回退時重新安裝 v0.3.0 的既有 release asset，不移動或覆寫舊 tag。
+
 
 ### v0.3.0 逐 App 音量控制（2026-10-12）
 
@@ -84,6 +104,20 @@
 - Swift 語言模式固定 5，避開 CoreAudio 回呼與 Swift 6 strict concurrency 的摩擦。
 
 ## 驗收清單
+
+### v0.3.1 目前驗收（2026-10-23，機器 PASS；人工未驗，使用者明確豁免）
+
+- [x] 最終 500 ms 版本 `swift test`：29/29 PASS（8 項 LevelMeter XCTest + 既有 21 項）
+- [x] `Scripts/make-app.sh` release build、arm64 與 `codesign --verify --strict` PASS
+- [x] App 版本 0.3.1 / build 9；`dist/macbar-0.3.1-arm64.dmg` 唯讀掛載、Applications 捷徑、完整 App 檔案 SHA manifest 與 build 一致及簽章 PASS
+- [x] CoreAudio smoke 7/7 PASS，輸出音量／mute 原值已還原
+- [x] 獨立程式碼快照複審 PASS
+- [ ] 靜態 mute 區別、滑桿／mute 即時生效、開啟時真實 VU、短暫訊號與停止歸零、關閉再開啟無殘留峰值（未驗，使用者於 2026-10-23 明確豁免）
+- [ ] 逐 App gain／mute、popover 關閉後 route 持續、程序／裝置切換與退出 cleanup（本版人工未驗，同日豁免）
+- [ ] 人工 TCC、macOS 13 / 14.3 fallback、Boom3D 與硬體矩陣（未重跑，同日豁免；不標 PASS）
+- [ ] GitHub Release 實際發佈、tag／asset、重新下載的 SHA-256 與本機產物一致（待完成）
+
+### 歷史驗收清單（v0.3.0，不代表 v0.3.1 已通過）
 
 - [x] `swift build -c release` 通過
 - [x] macbar.app 結構完整（Info.plist、AppIcon.icns、arm64 執行檔）

@@ -10,7 +10,7 @@ macbar 有兩條彼此獨立的音訊路徑：系統音量與 VU 控制，以及
 | `Sources/macbar/AppDelegate.swift` | 建立狀態列與 popover；啟動 `AppAudioController`；開啟 popover 時啟動 VU，關閉時停止 VU；退出時停止兩條量測／路由生命週期。 |
 | `Sources/macbar/AudioController.swift` | 控制系統預設輸入、輸出的音量與 mute，監聽裝置切換，保存系統軟體 mute 狀態，管理 VU monitor 的啟停。 |
 | `Sources/macbar/PopoverView.swift`、`AppAudioView.swift` | 呈現系統音量列、VU bar 與逐 App 清單、音量、mute、路由狀態及 Retry。 |
-| `Sources/macbar/LevelMeter.swift` | 將樣本 RMS 映射為 level，並平滑 attack/release。 |
+| `Sources/macbar/LevelMeter.swift` | 將 RMS 映射為 level；累積前次符合發布間隔後收到的 level 最大值，以最多每 500 ms 一次（2 Hz）發布，不是波形峰值。使用快速 attack 與時間式 release，抑制重複零值；消耗視窗與 reset 時清除累積值。 |
 | `Sources/macbar/MicLevelMonitor.swift` | 透過 `AVAudioEngine` input tap 量測麥克風 level；使用系統麥克風 TCC。 |
 | `Sources/macbar/OutputLevelMonitor.swift` | 透過 CoreAudio process tap 與 private aggregate device 量測輸出 VU；只由 popover 的 metering 狀態啟停。 |
 | `Sources/macbar/AppAudioController.swift` | 維護逐 App gain、程序分組、route、錯誤與 UI 狀態；監聽程序及預設輸出，並定期檢查 route。 |
