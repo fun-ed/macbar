@@ -34,9 +34,9 @@ macOS menu-bar volume controller: adjust the default output and input in real ti
 
 ### Installation
 
-v0.3.1 / build 9; release asset: [`macbar-0.3.1-arm64.dmg`](https://github.com/fun-ed/macbar/releases/download/v0.3.1/macbar-0.3.1-arm64.dmg). See `PLAN.md` for current publication status.
+[v0.3.1](https://github.com/fun-ed/macbar/releases/tag/v0.3.1) / build 9 was published on 2026-10-23; release asset: [`macbar-0.3.1-arm64.dmg`](https://github.com/fun-ed/macbar/releases/download/v0.3.1/macbar-0.3.1-arm64.dmg).
 
-Asset size: 688,443 bytes. SHA-256 of the locally verified DMG:
+Asset size: 688,443 bytes. Verified matching SHA-256 for the local DMG and the newly downloaded GitHub release asset:
 
 ```text
 7e6d2103d95cc7740a8f022a1735db84ccb87cb031c1cfd46c839066af9dd73a  macbar-0.3.1-arm64.dmg
@@ -145,9 +145,9 @@ macOS 選單列音量控制器：可即時調整預設輸出與輸入，也可�
 
 ### 安裝
 
-v0.3.1 / build 9；release asset：[`macbar-0.3.1-arm64.dmg`](https://github.com/fun-ed/macbar/releases/download/v0.3.1/macbar-0.3.1-arm64.dmg)。目前發佈狀態見 `PLAN.md`。
+[v0.3.1](https://github.com/fun-ed/macbar/releases/tag/v0.3.1) / build 9 已於 2026-10-23 發佈；release asset：[`macbar-0.3.1-arm64.dmg`](https://github.com/fun-ed/macbar/releases/download/v0.3.1/macbar-0.3.1-arm64.dmg)。
 
-Asset 大小：688,443 bytes。本機已驗證 DMG 的 SHA-256：
+Asset 大小：688,443 bytes。本機 DMG 與重新下載的 GitHub release asset 已驗證具有相同 SHA-256：
 
 ```text
 7e6d2103d95cc7740a8f022a1735db84ccb87cb031c1cfd46c839066af9dd73a  macbar-0.3.1-arm64.dmg

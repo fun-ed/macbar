@@ -7,24 +7,26 @@
 - Removed popover icon breathing and bar shimmer. Static muted-state distinctions and real VU metering remain; VU runs only while the popover is open. Slider and mute actions remain immediate.
 - VU levels publish at most every 500 ms, or 2 Hz. Each eligible publication uses the maximum incoming RMS-mapped level since the previous eligible publication, not a waveform peak. Fast attack and time-based release remain. Consuming a window or resetting clears accumulated levels; repeated zero updates are suppressed without losing the first return to zero.
 - Audio sample rate, capture callbacks, RMS stride, mapping and sensitivity, per-app routes, and the 250 ms health/discovery timer are unchanged. No new dependencies or TCC permissions are added.
-- Earlier animation-only CPU measurements used the same setup without capture or routes, retaining the original discovery timer. Visible for 20 seconds: 5.101% before, 0.282% after. Hidden for 60 seconds: 4.423% before, 0.277% after. These are not measurements of the final 500 ms meter or active-route CPU, and do not guarantee a particular CPU level during audio use.
+- Earlier animation-only CPU measurements from the 15 Hz stage used the same setup without capture or routes, retaining the original discovery timer. Visible for 20 seconds: 5.101% before, 0.282% after. Hidden for 60 seconds: 4.423% before, 0.277% after. These are not measurements of the final 500 ms meter or active-route CPU, and do not guarantee a particular CPU level during audio use.
 - Validated on 2026-10-23: all 29 tests passed, including 8 LevelMeter XCTests and 21 existing tests; release build, arm64, strict codesign, and independent code snapshot review passed. CoreAudio smoke passed 7/7, with output volume and mute restored.
 - DMG packaging used the existing hdiutil fallback because the create-dmg signing identity was unavailable. Read-only mounting, the Applications symlink to `/Applications`, mounted app version and signature passed; the full app file SHA manifest was byte-for-byte identical to the build.
-- After reviewing those results and the missing final 500 ms manual observations and full matrix, the user explicitly chose "保留未驗項，正式發佈" on 2026-10-23, authorizing formal publication with unverified items retained. This is a human waiver, not a manual PASS. Live VU, per-app route/lifecycle checks, full TCC, macOS 13 / 14.3, Boom3D, and the hardware matrix were not newly exercised; no new live-VU or active-route CPU measurements were taken.
+- After reviewing those results and the missing final 500 ms manual observations and full matrix, the user explicitly approved stable publication with unverified items retained on 2026-10-23. This is a human waiver, not a manual PASS. Live VU, per-app route/lifecycle checks, full TCC, macOS 13 / 14.3, Boom3D, and the hardware matrix were not newly exercised; no new live-VU or active-route CPU measurements were taken.
 - Ad-hoc signed, not notarized. The installed `/Applications/macbar.app` was left untouched. To roll back, reinstall the existing v0.3.0 release asset; its tag remains unchanged.
-- Version: `CFBundleShortVersionString` 0.3.1, `CFBundleVersion` 9; DMG: `macbar-0.3.1-arm64.dmg`. Local asset size and SHA-256 are recorded in `docs/ACCEPTANCE.md`.
+- Version: `CFBundleShortVersionString` 0.3.1, `CFBundleVersion` 9; DMG: `macbar-0.3.1-arm64.dmg`. Local and downloaded asset size and matching SHA-256 are recorded in `docs/ACCEPTANCE.md`.
+- [v0.3.1](https://github.com/fun-ed/macbar/releases/tag/v0.3.1) was published on 2026-10-23T05:31:08Z, neither draft nor prerelease. The newly downloaded GitHub asset matched the local SHA-256; read-only mounting, app version 0.3.1 / build 9, strict signature, Applications symlink, and the full app file SHA manifest all passed verification.
 
 ### 台灣繁體中文
 
 - 移除 popover 圖示呼吸與 bar 流光。保留靜態 mute 狀態區別與真實 VU，VU 只在 popover 開啟時運作。滑桿與 mute 操作仍即時生效。
 - VU level 最多每 500 ms 發布一次，也就是 2 Hz。每次符合發布間隔時，使用前次符合間隔後收到的 RMS 映射 level 最大值，不是波形峰值。保留快速 attack 與時間式 release。消耗視窗或 reset 後清除累積值；抑制重複零值更新，但保留首次歸零。
 - 音訊 sample rate、capture callbacks、RMS stride、映射與靈敏度、逐 App routes 及 250 ms health／discovery timer 不變。不新增相依或 TCC 權限。
-- 先前 animation-only CPU 量測使用相同環境，無擷取、無 route，保留原有 discovery timer。面板開啟 20 秒，修改前 5.101%、修改後 0.282%；隱藏 60 秒，修改前 4.423%、修改後 0.277%。這不是最終 500 ms meter 或 active-route CPU 的量測，不保證實際音訊使用時的 CPU 數值。
+- 先前 15 Hz 階段的 animation-only CPU 量測使用相同環境，無擷取、無 route，保留原有 discovery timer。面板開啟 20 秒，修改前 5.101%、修改後 0.282%；隱藏 60 秒，修改前 4.423%、修改後 0.277%。這不是最終 500 ms meter 或 active-route CPU 的量測，不保證實際音訊使用時的 CPU 數值。
 - 2026-10-23 驗證：29 項測試全數通過，包含 8 項 LevelMeter XCTest 與既有 21 項；release build、arm64、strict codesign 與獨立程式碼快照複審通過。CoreAudio smoke 7/7 通過，輸出音量與 mute 原值已還原。
 - DMG 因 create-dmg 簽章身分不可用，使用既有 hdiutil 後備封裝。唯讀掛載、Applications 捷徑指向 `/Applications`、掛載 App 的版本與簽章均通過；完整 App 檔案 SHA manifest 與 build 逐位元組一致。
 - 使用者在得知上述結果，以及缺少最終 500 ms 人工觀察與完整矩陣後，於 2026-10-23 明確選擇「保留未驗項，正式發佈」，同意保留未驗項並正式發佈。這是人工豁免，不是人工 PASS。本版 live VU、逐 App route／生命週期、完整 TCC、macOS 13 / 14.3、Boom3D 與硬體矩陣未新驗；未新增 live VU 或 active-route CPU 量測。
 - 維持 ad-hoc 簽章，未 notarized。已安裝的 `/Applications/macbar.app` 未動。若需回退，重新安裝既有 v0.3.0 release asset，不變更其 tag。
-- 版本資訊：`CFBundleShortVersionString` 0.3.1、`CFBundleVersion` 9；DMG 為 `macbar-0.3.1-arm64.dmg`。本機 asset 大小與 SHA-256 記錄於 `docs/ACCEPTANCE.md`。
+- 版本資訊：`CFBundleShortVersionString` 0.3.1、`CFBundleVersion` 9；DMG 為 `macbar-0.3.1-arm64.dmg`。本機與下載 asset 的大小及相同 SHA-256 記錄於 `docs/ACCEPTANCE.md`。
+- [v0.3.1](https://github.com/fun-ed/macbar/releases/tag/v0.3.1) 已於 2026-10-23T05:31:08Z 正式發佈，非 draft／prerelease。重新下載的 GitHub asset 與本機 SHA-256 一致；唯讀掛載、App 版本 0.3.1 / build 9、strict 簽章、Applications 捷徑及完整 App 檔案 SHA manifest 均驗證通過。
 
 ## v0.3.0 (2026-10-12)
 
